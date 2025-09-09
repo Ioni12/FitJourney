@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = "http://localhost:3000/api/user";
+const apiUrl = import.meta.env.VITE_BACKEND_URL + "/user";
 
 const api = axios.create({
   baseURL: apiUrl,
@@ -11,6 +11,7 @@ const api = axios.create({
 
 export const fetchUser = () => {
   const token = localStorage.getItem("token");
+  console.log(apiUrl);
 
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
