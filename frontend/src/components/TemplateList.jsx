@@ -115,7 +115,7 @@ const TemplateList = ({ refreshTrigger }) => {
   return (
     <div className="flex items-center justify-center p-4 min-h-screen">
       <div className="w-full max-w-4xl">
-        <div className="rounded-[40px] shadow-lg border border-zinc-400 bg-white/80 backdrop-blur-sm p-8 mt-22">
+        <div className="rounded-[40px] shadow-lg border border-zinc-400 bg-white/80 backdrop-blur-sm p-8 lg:-mt-20 -mt-[34vh]">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-mono tracking-wider mb-2">
               YOUR TEMPLATES
