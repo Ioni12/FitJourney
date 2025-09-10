@@ -13,6 +13,7 @@ const Navbar = () => {
     { label: "Home", path: "/" },
     { label: "Templates", path: "/templates" },
     { label: "Generate Exercises", path: "/test" },
+    { label: "Dashboard", path: "/dash" },
   ];
 
   const handleStartClick = () => {
