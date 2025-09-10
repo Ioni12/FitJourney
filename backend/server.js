@@ -7,6 +7,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/userRoute");
 const planRoutes = require("./routes/planRoutes");
 const exerciseRoutes = require("./routes/exerciseRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 connectDb();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
 app.use("/api/plan", planRoutes);
 app.use("/api/exercises", exerciseRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "build")));

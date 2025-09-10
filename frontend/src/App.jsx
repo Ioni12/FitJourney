@@ -7,6 +7,8 @@ import Hero from "./components/Hero";
 import CreateTemplate from "./components/CreateTemplate";
 import TemplateList from "./components/TemplateList";
 import AuthComponent from "./components/AuthComponent";
+import Dashboard from "./components/Dashboard";
+import WorkoutPlansDashboard from "./components/WorkoutPlansDashboard";
 
 const Templates = () => {
   return (
@@ -26,10 +28,11 @@ function App() {
           <main className="min-h-screen">
             <Routes>
               <Route path="/" element={<Hero />} />
-              <Route path="/test" element={<WorkoutPlanForm />} />
+              <Route path="/test" element={<WorkoutPlansDashboard />} />
               <Route path="/auth" element={<AuthComponent />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/workout-plans" element={<WorkoutPlansManager />} />
+              <Route path="/dash" element={<Dashboard />} />
             </Routes>
           </main>
         </AuthProvider>
