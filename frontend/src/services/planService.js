@@ -19,6 +19,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Existing workout plan functions
 export const generateExercisePlan = async (planData) => {
   try {
     const response = await api.post("/plan/generate", planData);
@@ -66,6 +67,96 @@ export const getWorkoutPlans = async () => {
 
     if (!response) {
       throw new Error("Failed to fetch workout plans");
+    }
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response ? error.response.data : "Network Error",
+    };
+  }
+};
+
+// Workout Session Management Functions
+export const startWorkoutFromPlan = async (planId, workoutIndex) => {
+  try {
+    const response = await api.post("/exercises/workout/start", {
+      planId,
+      workoutIndex,
+    });
+
+    if (!response) {
+      throw new Error("Failed to start workout");
+    }
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response ? error.response.data : "Network Error",
+    };
+  }
+};
+
+export const pauseWorkout = async (workoutLogId) => {
+  try {
+    const response = await api.patch(
+      `/exercises/workout/${workoutLogId}/pause`
+    );
+
+    if (!response) {
+      throw new Error("Failed to pause workout");
+    }
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response ? error.response.data : "Network Error",
+    };
+  }
+};
+
+export const resumeWorkout = async (workoutLogId) => {
+  try {
+    const response = await api.patch(
+      `/exercises/workout/${workoutLogId}/resume`
+    );
+
+    if (!response) {
+      throw new Error("Failed to resume workout");
+    }
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response ? error.response.data : "Network Error",
+    };
+  }
+};
+
+export const completeWorkout = async (workoutLogId) => {
+  try {
+    const response = await api.patch(
+      `/exercises/workout/${workoutLogId}/complete`
+    );
+
+    if (!response) {
+      throw new Error("Failed to complete workout");
     }
 
     return {

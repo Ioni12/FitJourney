@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getWorkoutPlans } from "../services/planService";
+import {
+  getWorkoutPlans,
+  startWorkoutFromPlan,
+  pauseWorkout,
+  resumeWorkout,
+  completeWorkout,
+} from "../services/planService";
 
 const WorkoutPlansManager = () => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
@@ -7,6 +13,8 @@ const WorkoutPlansManager = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [activeWorkout, setActiveWorkout] = useState(null);
+  const [workoutLoading, setWorkoutLoading] = useState(false);
 
   // Fetch workout plans on component mount
   useEffect(() => {
@@ -31,6 +39,68 @@ const WorkoutPlansManager = () => {
     }
 
     setLoading(false);
+  };
+
+  const handleStartWorkout = async (planId, workoutIndex) => {
+    setWorkoutLoading(true);
+    const result = await startWorkoutFromPlan(planId, workoutIndex);
+
+    if (result.success) {
+      setActiveWorkout({
+        logId: result.data.workoutLogId,
+        name: result.data.workoutName,
+        status: "active",
+      });
+      alert(`Started workout: ${result.data.workoutName}`);
+    } else {
+      alert(`Failed to start workout: ${result.error}`);
+    }
+    setWorkoutLoading(false);
+  };
+
+  const handlePauseWorkout = async () => {
+    if (!activeWorkout) return;
+
+    setWorkoutLoading(true);
+    const result = await pauseWorkout(activeWorkout.logId);
+
+    if (result.success) {
+      setActiveWorkout({ ...activeWorkout, status: "paused" });
+      alert("Workout paused");
+    } else {
+      alert(`Failed to pause workout: ${result.error}`);
+    }
+    setWorkoutLoading(false);
+  };
+
+  const handleResumeWorkout = async () => {
+    if (!activeWorkout) return;
+
+    setWorkoutLoading(true);
+    const result = await resumeWorkout(activeWorkout.logId);
+
+    if (result.success) {
+      setActiveWorkout({ ...activeWorkout, status: "active" });
+      alert("Workout resumed");
+    } else {
+      alert(`Failed to resume workout: ${result.error}`);
+    }
+    setWorkoutLoading(false);
+  };
+
+  const handleCompleteWorkout = async () => {
+    if (!activeWorkout) return;
+
+    setWorkoutLoading(true);
+    const result = await completeWorkout(activeWorkout.logId);
+
+    if (result.success) {
+      setActiveWorkout(null);
+      alert("Workout completed!");
+    } else {
+      alert(`Failed to complete workout: ${result.error}`);
+    }
+    setWorkoutLoading(false);
   };
 
   // Helper function to format goals array
@@ -125,6 +195,50 @@ const WorkoutPlansManager = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto pt-24">
+        {/* Active Workout Bar */}
+        {activeWorkout && (
+          <div className="mb-8">
+            <div className="rounded-[40px] shadow-lg border border-green-400 bg-green-100/80 backdrop-blur-sm">
+              <div className="flex justify-between items-center px-8 py-6">
+                <div className="font-mono tracking-wider text-slate-800">
+                  <div className="text-xl">ACTIVE WORKOUT</div>
+                  <div className="text-lg">{activeWorkout.name}</div>
+                  <div className="text-sm text-slate-600">
+                    Status: {activeWorkout.status}
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  {activeWorkout.status === "active" && (
+                    <button
+                      onClick={handlePauseWorkout}
+                      disabled={workoutLoading}
+                      className="bg-yellow-100 text-gray-900 px-6 py-3 rounded-2xl font-bold text-lg shadow-lg hover:bg-yellow-200 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      <span className="tracking-wide">PAUSE</span>
+                    </button>
+                  )}
+                  {activeWorkout.status === "paused" && (
+                    <button
+                      onClick={handleResumeWorkout}
+                      disabled={workoutLoading}
+                      className="bg-green-100 text-gray-900 px-6 py-3 rounded-2xl font-bold text-lg shadow-lg hover:bg-green-200 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      <span className="tracking-wide">RESUME</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={handleCompleteWorkout}
+                    disabled={workoutLoading}
+                    className="bg-blue-100 text-gray-900 px-6 py-3 rounded-2xl font-bold text-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 disabled:opacity-50"
+                  >
+                    <span className="tracking-wide">COMPLETE</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <div className="rounded-[40px] shadow-lg border border-zinc-400 bg-white/80 backdrop-blur-sm">
@@ -243,9 +357,6 @@ const WorkoutPlansManager = () => {
                   >
                     VIEW DETAILS
                   </button>
-                  <button className="flex-1 bg-purple-100 text-gray-900 py-3 px-4 rounded-2xl text-sm font-bold tracking-wide hover:bg-amber-500 transition-colors duration-200">
-                    START NOW
-                  </button>
                 </div>
               </div>
             </div>
@@ -327,6 +438,17 @@ const WorkoutPlansManager = () => {
                             {workout.name}
                           </h4>
                           <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                handleStartWorkout(selectedPlan._id, index)
+                              }
+                              disabled={workoutLoading || !!activeWorkout}
+                              className="bg-purple-100 text-gray-900 px-4 py-2 rounded-2xl text-sm font-bold tracking-wide hover:bg-amber-500 transition-colors duration-200 disabled:opacity-50"
+                            >
+                              <span className="tracking-wide">
+                                {workoutLoading ? "STARTING..." : "START"}
+                              </span>
+                            </button>
                             {workout.dayOfWeek && (
                               <span className="bg-slate-400 text-slate-800 px-4 py-2 rounded-2xl text-sm font-bold tracking-wide shadow-lg">
                                 {workout.dayOfWeek}

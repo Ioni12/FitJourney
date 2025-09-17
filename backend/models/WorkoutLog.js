@@ -24,6 +24,17 @@ const workoutLogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // Add these new fields:
+  planId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "WorkoutPlan",
+  },
+  workoutName: String, // "Full Body Foundation", etc.
+  status: {
+    type: String,
+    enum: ["active", "paused", "completed"],
+    default: "active",
+  },
   exercises: [exerciseLogSchema],
 });
 

@@ -4,7 +4,7 @@ const ExerciseTemplate = require("../models/ExerciseTemplate");
 
 const logExercise = async (req, res) => {
   const templateId = req.params.id;
-  const { reps, time } = req.body;
+  const { reps, time, workoutLogId } = req.body; // Add workoutLogId
   try {
     const userId = req.user?.id;
 
@@ -23,16 +23,34 @@ const logExercise = async (req, res) => {
       return res.status(400).json({ success: false, message: "no exercise" });
     }
 
-    let workoutLog = await WorkoutLog.findOne({
-      user: userId,
-      date: { $gte: new Date().setHours(0, 0, 0, 0) },
-    });
+    let workoutLog;
 
-    if (!workoutLog) {
-      workoutLog = new WorkoutLog({ user: userId, exercises: [] });
+    // If workoutLogId provided, use that specific workout session
+    if (workoutLogId) {
+      workoutLog = await WorkoutLog.findOne({
+        _id: workoutLogId,
+        user: userId,
+        status: "active",
+      });
+
+      if (!workoutLog) {
+        return res.status(404).json({
+          success: false,
+          message: "Active workout session not found",
+        });
+      }
+    } else {
+      // Your existing logic for daily logging
+      workoutLog = await WorkoutLog.findOne({
+        user: userId,
+        date: { $gte: new Date().setHours(0, 0, 0, 0) },
+      });
+
+      if (!workoutLog) {
+        workoutLog = new WorkoutLog({ user: userId, exercises: [] });
+      }
     }
 
-    // push a new exercise log entry
     workoutLog.exercises.push({
       exerciseTemplate: templateId,
       reps,
@@ -77,4 +95,98 @@ const getExerciseLogs = async (req, res) => {
   }
 };
 
-module.exports = { logExercise, getExerciseLogs };
+const startWorkoutFromPlan = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { planId, workoutIndex } = req.body;
+
+    const workoutPlan = await WorkoutPlan.findOne({
+      _id: planId,
+      user: userId,
+    });
+
+    if (!workoutPlan || !workoutPlan.workouts[workoutIndex]) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Workout not found" });
+    }
+
+    const selectedWorkout = workoutPlan.workouts[workoutIndex];
+
+    const workoutLog = new WorkoutLog({
+      user: userId,
+      planId: planId,
+      workoutName: selectedWorkout.name,
+      status: "active",
+      exercises: [],
+    });
+
+    await workoutLog.save();
+
+    res.json({
+      success: true,
+      workoutLogId: workoutLog._id,
+      workoutName: selectedWorkout.name,
+      message: "Workout session started from plan",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const pauseWorkout = async (req, res) => {
+  try {
+    const { workoutLogId } = req.params;
+    const userId = req.user?.id;
+
+    await WorkoutLog.findOneAndUpdate(
+      { _id: workoutLogId, user: userId },
+      { status: "paused" }
+    );
+
+    res.json({ success: true, message: "Workout paused" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const resumeWorkout = async (req, res) => {
+  try {
+    const { workoutLogId } = req.params;
+    const userId = req.user?.id;
+
+    await WorkoutLog.findOneAndUpdate(
+      { _id: workoutLogId, user: userId },
+      { status: "active" }
+    );
+
+    res.json({ success: true, message: "Workout resumed" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const completeWorkout = async (req, res) => {
+  try {
+    const { workoutLogId } = req.params;
+    const userId = req.user?.id;
+
+    await WorkoutLog.findOneAndUpdate(
+      { _id: workoutLogId, user: userId },
+      { status: "completed" }
+    );
+
+    res.json({ success: true, message: "Workout completed" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  logExercise,
+  getExerciseLogs,
+  completeWorkout,
+  resumeWorkout,
+  pauseWorkout,
+  startWorkoutFromPlan,
+};
