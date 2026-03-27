@@ -44,24 +44,24 @@ A swimlane Activity Diagram illustrating the parallel interactions between the c
 ```mermaid
 graph TD
     subgraph User_Actor [User]
-        Start([Start]) --> ClickAdd[Clicks "Add Workout"]
-        Submit[Submits details]
+        Start([Start]) --> ClickAdd["Clicks Add Workout"]
+        Submit["Submits details"]
     end
     
     subgraph Frontend_App [Frontend App]
-        ShowForm[Displays Workout Form]
-        HandleSubmit[POST /api/workouts]
-        ShowSuccess[Success Toast & Redirect]
+        ShowForm["Displays Workout Form"]
+        HandleSubmit["POST /api/workouts"]
+        ShowSuccess["Success Toast & Redirect"]
     end
     
     subgraph Backend_API [Backend API]
         Validate{Validate Payload}
-        InsertDB[INSERT into Workouts]
-        TriggerAnalytics[Trigger Analytics]
+        InsertDB["INSERT into Workouts"]
+        TriggerAnalytics["Trigger Analytics"]
     end
     
     subgraph Database_Layer [Database]
-        WriteDB[(Commit Transaction)]
+        WriteDB[("Commit Transaction")]
     end
 
     %% Flow
