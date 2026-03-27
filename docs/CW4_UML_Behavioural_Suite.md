@@ -42,37 +42,42 @@ graph LR
 A swimlane Activity Diagram illustrating the parallel interactions between the client UI, the backend server API, and the database.
 
 ```mermaid
-swimlane
-    actor User
-    participant Frontend
-    participant BackendAPI
-    database Database
-
-    User->Frontend: Clicks "Add Workout"
-    activate Frontend
-    Frontend-->User: Displays Workout Form
-    User->Frontend: Submits workout details
-    
-    Frontend->BackendAPI: POST /api/workouts (JSON)
-    activate BackendAPI
-    
-    BackendAPI->BackendAPI: Validate payload
-    alt is Invalid
-        BackendAPI-->Frontend: 400 Bad Request
-        Frontend-->User: Show validation errors
-    else is Valid
-        BackendAPI->Database: INSERT into Workouts
-        activate Database
-        Database-->BackendAPI: Success (ID: 1024)
-        deactivate Database
-        
-        BackendAPI->BackendAPI: Trigger Async Analytics Recalculation
-        
-        BackendAPI-->Frontend: 201 Created
-        Frontend-->User: Success Toast & Redirect to Dashboard
+graph TD
+    subgraph User_Actor [User]
+        Start([Start]) --> ClickAdd[Clicks "Add Workout"]
+        Submit[Submits details]
     end
-    deactivate BackendAPI
-    deactivate Frontend
+    
+    subgraph Frontend_App [Frontend App]
+        ShowForm[Displays Workout Form]
+        HandleSubmit[POST /api/workouts]
+        ShowSuccess[Success Toast & Redirect]
+    end
+    
+    subgraph Backend_API [Backend API]
+        Validate{Validate Payload}
+        InsertDB[INSERT into Workouts]
+        TriggerAnalytics[Trigger Analytics]
+    end
+    
+    subgraph Database_Layer [Database]
+        WriteDB[(Commit Transaction)]
+    end
+
+    %% Flow
+    Start --> ClickAdd
+    ClickAdd --> ShowForm
+    ShowForm --> Submit
+    Submit --> HandleSubmit
+    HandleSubmit --> Validate
+    
+    Validate -- "is Valid" --> InsertDB
+    Validate -- "is Invalid" --> ShowForm
+    
+    InsertDB --> WriteDB
+    WriteDB --> TriggerAnalytics
+    TriggerAnalytics --> ShowSuccess
+    ShowSuccess --> End([End])
 ```
 
 ## 3. Sequence Diagrams
