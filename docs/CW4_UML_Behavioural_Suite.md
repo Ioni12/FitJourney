@@ -2,41 +2,39 @@
 
 ## 1. Refined Use Case Diagram
 
-This diagram refines CW3 by formalizing the system boundary and organizing the use cases into "Core Tracking" and "User Administration".
-
 ```mermaid
-usecaseDiagram
-    actor User
-    actor SystemAdmin
+graph LR
+    User((User))
+    SystemAdmin((System Admin))
     
-    package FitJourney_App {
-        package User_Administration {
-            usecase "Authenticate User" as UC_Auth
-            usecase "Register Profile" as UC_Reg
-            usecase "Manage Users" as UC_Admin
-        }
+    subgraph FitJourney_App [FitJourney App]
+        subgraph User_Administration [User Administration]
+            UC_Auth([Authenticate User])
+            UC_Reg([Register Profile])
+            UC_Admin([Manage Users])
+        end
         
-        package Core_Tracking {
-            usecase "View Dashboard" as UC_Dash
-            usecase "Query Analytics" as UC_Ana
-            usecase "Log Workout" as UC_Work
-            usecase "Share Workout" as UC_Share
-        }
-    }
+        subgraph Core_Tracking [Core Tracking]
+            UC_Dash([View Dashboard])
+            UC_Ana([Query Analytics])
+            UC_Work([Log Workout])
+            UC_Share([Share Workout])
+        end
+        
+        %% Relationships
+        UC_Reg -.->|"<<include>>"| UC_Auth
+        UC_Dash -.->|"<<include>>"| UC_Auth
+        UC_Work -.->|"<<include>>"| UC_Auth
+        
+        UC_Dash -.->|"<<include>>"| UC_Ana
+        UC_Share -.->|"<<extend>>"| UC_Work
+    end
     
-    User --> UC_Reg
-    User --> UC_Dash
-    User --> UC_Work
+    User --- UC_Reg
+    User --- UC_Dash
+    User --- UC_Work
     
-    SystemAdmin --> UC_Admin
-    
-    %% Relationships
-    UC_Reg ..> UC_Auth : <<include>>
-    UC_Dash ..> UC_Auth : <<include>>
-    UC_Work ..> UC_Auth : <<include>>
-    
-    UC_Dash ..> UC_Ana : <<include>>
-    UC_Work <.. UC_Share : <<extend>>
+    SystemAdmin --- UC_Admin
 ```
 
 ## 2. Activity Diagram: "Log New Workout"

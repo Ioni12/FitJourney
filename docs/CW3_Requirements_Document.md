@@ -31,38 +31,35 @@ graph TD
 ## 3. Use Case Diagram
 
 ```mermaid
-usecaseDiagram
-    actor User as User
-    actor Admin as System Administrator
-    
-    package FitJourney_System {
-        usecase "Login" as UC1
-        usecase "Register" as UC2
-        usecase "Edit Profile" as UC3
-        usecase "Log Workout" as UC4
-        usecase "Log Nutrition" as UC5
-        usecase "View Dashboard" as UC6
-        usecase "Manage Users" as UC7
-        usecase "Search Food DB" as UC8
+graph LR
+    subgraph FitJourney_System [FitJourney System]
+        UC1([Login])
+        UC2([Register])
+        UC3([Edit Profile])
+        UC4([Log Workout])
+        UC5([Log Nutrition])
+        UC6([View Dashboard])
+        UC7([Manage Users])
+        UC8([Search Food DB])
         
-        %% Include and extend examples
-        UC2 ..> UC1 : <<include>>
-        UC4 ..> UC1 : <<include>>
-        UC5 ..> UC1 : <<include>>
-        UC6 ..> UC1 : <<include>>
+        %% Relationships
+        UC2 -.->|"<<include>>"| UC1
+        UC4 -.->|"<<include>>"| UC1
+        UC5 -.->|"<<include>>"| UC1
+        UC6 -.->|"<<include>>"| UC1
         
-        UC5 <.. UC8 : <<extend>>
-    }
+        UC8 -.->|"<<extend>>"| UC5
+    end
 
-    User --> UC1
-    User --> UC2
-    User --> UC3
-    User --> UC4
-    User --> UC5
-    User --> UC6
+    User((User)) --- UC1
+    User --- UC2
+    User --- UC3
+    User --- UC4
+    User --- UC5
+    User --- UC6
     
-    Admin --> UC1
-    Admin --> UC7
+    Admin((System Administrator)) --- UC1
+    Admin --- UC7
 ```
 
 ## 4. Use Case Narratives
