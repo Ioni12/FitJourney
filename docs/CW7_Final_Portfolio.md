@@ -51,3 +51,11 @@ If we were to rebuild FitJourney from scratch, the single most impactful change 
 During our Sprint 2 & 3 integrations, we consistently ran into situations where frontend dashboard components completely failed to render because the backend API adjusted a JSON property name (e.g., `exerciseId` to `exercise_id`). Since we didn't have automated integration tests running on a CI/CD pipeline, we didn't discover these regressions until manual QA testing just days before the milestone submission. 
 
 Overall, the project allowed us to realize how critical structured planning is before writing code. Drafting the UML diagrams in CW3 and CW4 forced us to uncover edge-cases (like the email verification loop) before we had written any Javascript. While the UML felt dense to produce initially, it ultimately saved us likely dozens of hours of blind structural refactoring.
+
+## 5. Presentation Talking Points (5-Minute Guide)
+
+1.  **The Hook (1m):** Introduce FitJourney. Highlight the problem of "consistency" and how our tool uses data visualization to solve it. Mention our 3-actor model (User, Trainer, Admin).
+2.  **The Process (1m):** Explain the Agile/Scrum choice. Show the CW2 Backlog and explain how we used INVEST to ensure quality stories.
+3.  **The Design (1.5m):** Walk through the DFDs (CW3) and the Sequence Diagrams (CW4). Highlight the Email Verification loop as a "complex real-world edge case" we designed for. Mention the 3-tier Layered Architecture.
+4.  **Project Management (1m):** Show the Gantt chart and RACI. Most importantly, mention the **Effort Estimate (CW6)**—be honest that our UCP calculation showed 1,166 hours, justifying our decision to use frameworks like React/Node to finish the MVP on time.
+5.  **Reflection (0.5m):** Conclude with the need for TDD. Summarize that the structured documentation (CW1-CW6) was the map that kept our development team from getting lost.
