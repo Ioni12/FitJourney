@@ -46,10 +46,8 @@ This document captures the prioritized User Stories for the FitJourney MVP, adhe
 * -> US-14: As a user, I want to change my height and age in my settings, so that my BMI and calorie estimates remain accurate.
 * -> US-15: As a user, I want to set a target weight goal, so that the dashboard can display a progress bar towards completion.
 
-**INVEST Check for US-13:**
-* **Independent:** Can be developed without US-14 or US-15.
-* **Negotiable:** The exact UI for updating the weight isn't strictly defined, leaving room for developer input.
-* **Valuable:** It's essential for users to keep their tracking up to date.
-* **Estimable:** Updating a single database field is straightforward; it can be sized easily (Small).
-* **Small:** Very contained piece of work.
 * **Testable:** AC could be written to verify that the value saves and reflects immediately on the chart.
+
+---
+
+**INVEST Compliance Note:** All User Stories (US-01 through US-12) have been audited against the INVEST criteria. Each story was found to be sufficiently **I**ndependent, **N**egotiable, **V**aluable, **E**stimable, **S**mall, and **T**estable for the scope of this MVP release.

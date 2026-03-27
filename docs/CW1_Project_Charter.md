@@ -1,6 +1,8 @@
 # CW1 — Project Charter: FitJourney
 
-**System Name:** FitJourney — Personal Fitness & Wellness Tracker
+**Project Name:** FitJourney
+**Team Size:** 3-4 Students
+**Project Manager / Course Contact:** [Course Participant Name]
 
 **Problem Statement:** Many individuals struggle to maintain consistency in their fitness routines due to a lack of organized tracking tools. Existing apps are either overly complex, focusing solely on elite athletes, or too simplistic to provide meaningful insights. FitJourney aims to bridge this gap by offering a streamlined, intuitive platform that allows users to seamlessly log workouts, track nutrition, and visualize their progress over time, keeping them motivated and on track.
 
