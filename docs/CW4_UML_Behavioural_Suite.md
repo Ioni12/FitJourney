@@ -1,0 +1,165 @@
+# CW4 — UML Behavioural Suite
+
+## 1. Refined Use Case Diagram
+
+This diagram refines CW3 by formalizing the system boundary and organizing the use cases into "Core Tracking" and "User Administration".
+
+```mermaid
+usecaseDiagram
+    actor User
+    actor SystemAdmin
+    
+    package FitJourney_App {
+        package User_Administration {
+            usecase "Authenticate User" as UC_Auth
+            usecase "Register Profile" as UC_Reg
+            usecase "Manage Users" as UC_Admin
+        }
+        
+        package Core_Tracking {
+            usecase "View Dashboard" as UC_Dash
+            usecase "Query Analytics" as UC_Ana
+            usecase "Log Workout" as UC_Work
+            usecase "Share Workout" as UC_Share
+        }
+    }
+    
+    User --> UC_Reg
+    User --> UC_Dash
+    User --> UC_Work
+    
+    SystemAdmin --> UC_Admin
+    
+    %% Relationships
+    UC_Reg ..> UC_Auth : <<include>>
+    UC_Dash ..> UC_Auth : <<include>>
+    UC_Work ..> UC_Auth : <<include>>
+    
+    UC_Dash ..> UC_Ana : <<include>>
+    UC_Work <.. UC_Share : <<extend>>
+```
+
+## 2. Activity Diagram: "Log New Workout"
+
+A swimlane Activity Diagram illustrating the parallel interactions between the client UI, the backend server API, and the database.
+
+```mermaid
+swimlane
+    actor User
+    participant Frontend
+    participant BackendAPI
+    database Database
+
+    User->Frontend: Clicks "Add Workout"
+    activate Frontend
+    Frontend-->User: Displays Workout Form
+    User->Frontend: Submits workout details
+    
+    Frontend->BackendAPI: POST /api/workouts (JSON)
+    activate BackendAPI
+    
+    BackendAPI->BackendAPI: Validate payload
+    alt is Invalid
+        BackendAPI-->Frontend: 400 Bad Request
+        Frontend-->User: Show validation errors
+    else is Valid
+        BackendAPI->Database: INSERT into Workouts
+        activate Database
+        Database-->BackendAPI: Success (ID: 1024)
+        deactivate Database
+        
+        BackendAPI->BackendAPI: Trigger Async Analytics Recalculation
+        
+        BackendAPI-->Frontend: 201 Created
+        Frontend-->User: Success Toast & Redirect to Dashboard
+    end
+    deactivate BackendAPI
+    deactivate Frontend
+```
+
+## 3. Sequence Diagrams
+
+### Simple Sequence: View Dashboard
+Demonstrating a straightforward 3-object read interaction.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant ReactApp
+    participant API
+    participant DB
+
+    User->>ReactApp: Navigate to /dashboard
+    activate ReactApp
+    ReactApp->>API: GET /api/user/analytics
+    activate API
+    API->>DB: Query Aggregated Metrics
+    activate DB
+    DB-->>API: Metric Data (JSON)
+    deactivate DB
+    API-->>ReactApp: 200 OK (Data)
+    deactivate API
+    ReactApp-->>User: Render Charts & Feed
+    deactivate ReactApp
+```
+
+### Complex Sequence: Registration with Email Verification Loop
+Demonstrating loops, conditions, and external services.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant AuthController
+    participant UserDB
+    participant EmailService
+
+    User->>Frontend: Submit Registration Form
+    Frontend->>AuthController: POST /auth/register
+    
+    AuthController->>UserDB: Query if Email Exists
+    UserDB-->>AuthController: Returns Null (Not Found)
+    
+    alt Email Found
+        AuthController-->>Frontend: 409 Conflict
+    else Email Unique
+        AuthController->>AuthController: Hash Password
+        AuthController->>UserDB: Insert User (unverified)
+        UserDB-->>AuthController: OK
+        
+        loop Retries (Max 3)
+            AuthController->>EmailService: Send Verification Token
+            alt Email Sent
+                EmailService-->>AuthController: Success
+            else SMTP Error
+                EmailService-->>AuthController: Fail, Retry Next Item
+            end
+        end
+        
+        AuthController-->>Frontend: 201 Created (Token)
+        Frontend-->>User: "Please check your email"
+    end
+```
+
+## 4. Communication Diagram
+
+Derived from the "Simple Sequence: View Dashboard" diagram to emphasize the organizational relationships between objects rather than the strict chronological sequence.
+
+**Text-Notation Model:**
+```
+  [User (Browser)] 
+         │ 
+         │ 1: navigateDashboard()
+         │ 4: renderView()
+         ▼ 
+  [ReactApp (Frontend)] ─────────► [API (Backend Service)]
+                          2: getAnalytics() │
+                          3: returnJson()   │
+                                            │ 2.1: queryMetrics()
+                                            │ 2.2: returnData()
+                                            ▼
+                                   [DB (PostgreSQL)]
+```
+
+## 5. Diagram Rationale
+We selected the **"Log Workout"** flow for the Activity Diagram because it is the core intellectual transform of the system (taking raw user data and making it persistent) and involves a clear decision fork (validation success vs. failure). We chose **Registration** for the complex Sequence Diagram because it demonstrates an external service interaction (EmailService) and a potential loop (retry logic for sending emails), which accurately reflects common enterprise application concerns.
