@@ -2,6 +2,13 @@
 
 ## 1. Refined Use Case Diagram
 
+### Changes from CW3
+Based on peer feedback and a more robust architectural review, the following refinements were made to the Use Case diagram:
+1. **System Boundary**: Formally defined the `FitJourney_App` boundary to exclude external actors.
+2. **Modularization**: Grouped use cases into logical packages (`User Administration` and `Core Tracking`) to reflect the 3-tier architecture.
+3. **Actor Precision**: Distinguished between the `User` and `SystemAdmin` roles more clearly, refining the associations to ensure Principle of Least Privilege.
+4. **Relationship Cleanup**: Refined the `<<include>>` and `<<extend>>` relationships to avoid diagram congestion.
+
 ```mermaid
 graph LR
     User((User))
